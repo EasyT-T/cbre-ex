@@ -42,7 +42,7 @@ namespace CBRE.Editor
 	{
 		private JumpList _jumpList;
 		private DiscordManager _DiscordManager;
-		
+
 		public static Editor Instance { get; private set; }
 
 		public const string GITHUB_REPORT_BUG_URL = "https://github.com/SCP-CB-Community-Preservation-Project/cbre-ex/issues/new?assignees=Saalvage&labels=bug&template=bug_report.md&title=";
@@ -75,12 +75,12 @@ namespace CBRE.Editor
 			try
 			{
 				Image[] lightmaps;
-				Map map = MapProvider.GetMapFromFile(fileName, Directories.ModelDirs, out lightmaps);
+				Map map = MapProvider.GetMapFromFile(fileName, Directories.ModelDirs, out lightmaps, out MapProvider provider);
 				if (MapProvider.warnings != "")
 				{
 					MessageBox.Show(MapProvider.warnings, "WARNING", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				}
-				Document doc = new Document(fileName, map, game);
+				Document doc = new Document(fileName, map, game, provider.PostLoad);
 				DocumentManager.AddAndSwitch(doc);
 				if (lightmaps != null)
 				{
@@ -161,6 +161,7 @@ namespace CBRE.Editor
 			}
 
 			TextureProvider.SetCachePath(SettingsManager.GetTextureCachePath());
+			MapProvider.Register(new RMeshProvider());
 			MapProvider.Register(new CBRProvider());
 			MapProvider.Register(new VmfProvider());
 			MapProvider.Register(new L3DWProvider());
@@ -421,7 +422,7 @@ namespace CBRE.Editor
 			}
 			ViewportManager.RefreshClearColour(Instance.DocumentTabs.TabPages.Count == 0);
 			TextureHelper.EnableTransparency = !CBRE.Settings.View.GloballyDisableTransparency;
-			
+
 			Editor.Instance.ToggleDiscord(CBRE.Settings.General.EnableDiscordPresence);
 		}
 

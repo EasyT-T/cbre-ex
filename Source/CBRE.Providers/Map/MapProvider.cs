@@ -33,10 +33,10 @@ namespace CBRE.Providers.Map
             RegisteredProviders.Clear();
         }
 
-        public static DataStructures.MapObjects.Map GetMapFromFile(string fileName, IEnumerable<string> modelDirs, out Image[] lightmaps)
+        public static DataStructures.MapObjects.Map GetMapFromFile(string fileName, IEnumerable<string> modelDirs, out Image[] lightmaps, out MapProvider provider)
         {
             if (!File.Exists(fileName)) throw new ProviderException("The supplied file doesn't exist.");
-            MapProvider provider = RegisteredProviders.FirstOrDefault(p => p.IsValidForFileName(fileName));
+            provider = RegisteredProviders.FirstOrDefault(p => p.IsValidForFileName(fileName));
             if (provider != null)
             {
                 warnings = "";
@@ -86,5 +86,9 @@ namespace CBRE.Providers.Map
         protected abstract DataStructures.MapObjects.Map GetFromStream(Stream stream, IEnumerable<string> modelDirs, out Image[] lightmaps);
         protected abstract void SaveToStream(Stream stream, DataStructures.MapObjects.Map map, DataStructures.GameData.GameData gameData, TextureCollection textureCollection);
         protected abstract IEnumerable<MapFeature> GetFormatFeatures();
+
+        public virtual void PostLoad(DataStructures.MapObjects.Map map,TextureCollection textureCollection)
+        {
+        }
     }
 }

@@ -208,5 +208,12 @@ namespace CBRE.Providers
             bw.Write(c.B);
             bw.Write(c.A);
         }
+
+        public static string ReadB3DString(this BinaryReader br)
+        {
+            var length = br.ReadInt32();
+
+            return br.ReadFixedLengthString(Encoding.ASCII, length);
+        }
     }
 }

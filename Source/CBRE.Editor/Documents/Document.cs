@@ -61,7 +61,7 @@ namespace CBRE.Editor.Documents
             TextureCollection = new TextureCollection(new List<TexturePackage>());
         }
 
-        public Document(string mapFile, Map map, Game game)
+        public Document(string mapFile, Map map, Game game, Action<Map, TextureCollection> postAction = null)
         {
             MapFile = mapFile;
             Map = map;
@@ -106,19 +106,21 @@ namespace CBRE.Editor.Documents
             IEnumerable<TextureItem> items = TextureCollection.GetItems(texList);
             TextureProvider.LoadTextureItems(items);
 
+            postAction?.Invoke(map, TextureCollection);
+
             Map.PostLoadProcess(GameData, GetTexture, SettingsManager.GetSpecialTextureOpacity);
             Map.UpdateDecals(this);
             Map.UpdateModels(this);
             Map.UpdateSprites(this);
-            
+
             IEnumerable<Entity> allEntities = map.WorldSpawn.Find(x => x.ClassName != null).OfType<Entity>();
 
             if (allEntities.Any(x => x.GameData == null))
             {
                 MessageBox.Show("CBRE-EX has found some unknown entities in this map file.\n" +
                                 "They will not be exported, and they will appear as a small colored cube in the 3D viewport.\n" +
-                                "Please, ask the creator of this map for the appropriate JSON files for this map.", 
-                    "Warning!", 
+                                "Please, ask the creator of this map for the appropriate JSON files for this map.",
+                    "Warning!",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
